@@ -1,12 +1,7 @@
-fn main() {
-    println!("Hello, world!");
-}
+//! src/main.rs
+use zero2prod::run;
 
-mod test {
-
-    #[test]
-    fn test_main() {
-        crate::main();
-        assert!(true);
-    }
+#[tokio::main]
+async fn main() -> Result<(), std::io::Error> {
+    run().await
 }
