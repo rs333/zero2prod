@@ -1,12 +1,12 @@
-fn main() {
-    println!("Hello, world!");
-}
+//! src/main.rs
+use std::net::TcpListener;
 
-mod test {
+use zero2prod::run;
 
-    #[test]
-    fn test_main() {
-        crate::main();
-        assert!(true);
-    }
+#[tokio::main]
+async fn main() -> Result<(), std::io::Error> {
+    let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind to random port.");
+    let port = listener.local_addr().unwrap().port();
+    println!("Bound on port: {}", port);
+    run(listener)?.await
 }
