@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  zero2prod:
+    container_name: zero2prod
+    image: zero2prod
+    ports:
+      - 8000:8000
+    volumes:
+      - ./configuration:/app/configuration
+
