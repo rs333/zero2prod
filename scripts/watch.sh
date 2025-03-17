@@ -1,0 +1,2 @@
+#!/bin/bash
+ TEST_LOG=true cargo watch -x "test -- --nocapture | jq -R 'fromjson? | {msg, elapsed_milliseconds, subscriber_name, request_id, subscriber_email} | del(..|nulls)'" -x "run | jq  '{msg, elapsed_milliseconds, subscriber_name, request_id, subscriber_email} | del(..|nulls)'"
