@@ -35,6 +35,8 @@ claims = "0.8.0"
 validator = "0.20.0"
 quickcheck = "1.0.3"
 quickcheck_macros = "1.0.0"
+reqwest = { version = "^0.12", default-features = false, features = ["json", "rustls-tls"] }
+wiremock = "0.6.3"
 
 [dependencies.sqlx]
 version = "^0.8.3"
@@ -50,5 +52,4 @@ features = [
 
 [dev-dependencies]
 fake = { version = "4.0.0", features = ["email_address"] }
-reqwest = "^0.12"
 
