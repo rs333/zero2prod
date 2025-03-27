@@ -8,4 +8,6 @@ services:
       - 8000:8000
     volumes:
       - ./configuration:/app/configuration
+    environment:
+      - APP_APPLICATION__BASE_URL:"http://127.0.0.1"
 
