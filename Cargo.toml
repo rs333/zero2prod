@@ -14,7 +14,7 @@ name = "zero2prod"
 
 [dependencies]
 actix-web = "^4"
-tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.44.2", features = ["macros", "rt-multi-thread"] }
 serde = { version = "1", features = ["derive"]}
 config = "^0.15"
 uuid = { version = "1", features = ["v4"] }
@@ -35,6 +35,7 @@ claims = "0.8.0"
 validator = "0.20.0"
 quickcheck = "1.0.3"
 quickcheck_macros = "1.0.0"
+reqwest = { version = "^0.12", default-features = false, features = ["json", "rustls-tls"] }
 
 [dependencies.sqlx]
 version = "^0.8.3"
@@ -50,5 +51,6 @@ features = [
 
 [dev-dependencies]
 fake = { version = "4.0.0", features = ["email_address"] }
-reqwest = "^0.12"
+linkify = "0.10.0"
+wiremock = "0.6.3"
 

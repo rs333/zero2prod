@@ -1,4 +1,6 @@
-use super::{subscriber_email::SubscriberEmail, subscriber_name::SubscriberName};
+use super::{
+    subscriber_email::SubscriberEmail, subscriber_name::SubscriberName,
+};
 
 #[derive(serde::Deserialize)]
 pub struct NewSubscriber {

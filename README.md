@@ -1,5 +1,7 @@
-[![Rust](https://github.com/rs333/zero2prod/actions/workflows/general.yml/badge.svg?branch=main)](https://github.com/rs333/zero2prod/actions/workflows/general.yml)
-[![Security audit](https://github.com/rs333/zero2prod/actions/workflows/audit.yml/badge.svg?branch=main)](https://github.com/rs333/zero2prod/actions/workflows/audit.yml)
+| Branch | Status |
+|--------|--------|
+| main | [![Rust (main)](https://github.com/rs333/zero2prod/actions/workflows/general.yml/badge.svg?branch=main)](https://github.com/rs333/zero2prod/actions/workflows/general.yml) [![Security audit (main)](https://github.com/rs333/zero2prod/actions/workflows/audit.yml/badge.svg?branch=main)](https://github.com/rs333/zero2prod/actions/workflows/audit.yml) |
+| dev | [![Rust (dev)](https://github.com/rs333/zero2prod/actions/workflows/general.yml/badge.svg?branch=dev)](https://github.com/rs333/zero2prod/actions/workflows/general.yml) [![Security audit (dev)](https://github.com/rs333/zero2prod/actions/workflows/audit.yml/badge.svg?branch=dev)](https://github.com/rs333/zero2prod/actions/workflows/audit.yml) |
 
 # Zero to Production in Rust
 ## How to build
