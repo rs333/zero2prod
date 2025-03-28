@@ -165,3 +165,18 @@ jobs:
           SKIP_DOCKER=true ./scripts/init_db.sh
       - name: Generate code coverage
         run: cargo install cargo-tarpaulin && cargo tarpaulin --verbose --workspace
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: tarpaulin-report.html
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./tarpaulin-report.html
+          flags: unittests
+          name: codecov-coverage
+          fail_ci_if_error: true
