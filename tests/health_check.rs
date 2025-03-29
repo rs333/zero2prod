@@ -3,11 +3,11 @@
 use std::net::TcpListener;
 
 use once_cell::sync::Lazy;
-use secrecy::ExposeSecret;
 use sqlx::{Connection, Executor, PgConnection, PgPool, Row};
 use uuid::Uuid;
 use zero2prod::{
     configuration::{DatabaseSettings, get_configuration},
+    email_client::EmailClient,
     telemetry::{get_subscriber, init_subscriber},
 };
 
@@ -31,10 +31,9 @@ pub struct TestApp {
 }
 
 pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
-    let mut connection =
-        PgConnection::connect(config.connection_string_without_db().expose_secret())
-            .await
-            .expect("Failed to connect to Postgres");
+    let mut connection = PgConnection::connect_with(&config.without_db())
+        .await
+        .expect("Failed to connect to Postgres");
 
     let databases = sqlx::query(
         format!(
@@ -59,7 +58,7 @@ pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
         .await
         .expect("Failed to create database.");
 
-    let connection_pool = PgPool::connect(config.connection_string().expose_secret())
+    let connection_pool = PgPool::connect_with(config.with_db())
         .await
         .expect("Failed to connect to Postgres.");
 
@@ -82,8 +81,19 @@ async fn spawn_app() -> TestApp {
 
     let db_pool = configure_database(&configuration.database).await;
 
-    let server =
-        zero2prod::startup::run(listener, db_pool.clone()).expect("Failed to bind address");
+    let sender = configuration
+        .email_client
+        .sender()
+        .expect("Invalid subscriber email address.");
+
+    let email_client = EmailClient::new(
+        configuration.email_client.base_url,
+        sender,
+        configuration.email_client.authorization_token,
+    )
+    .await;
+    let server = zero2prod::startup::run(listener, db_pool.clone(), email_client)
+        .expect("Failed to bind address");
     let _ = tokio::spawn(server);
 
     TestApp { address, db_pool }
@@ -172,6 +182,35 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
             response.status().as_u16(),
             " the API did not fail with 400 Bad Request when the payload was {}.",
             error_message
+        );
+    }
+}
+
+#[tokio::test]
+async fn subscribe_returns_a_400_for_when_fields_are_present_but_empty() {
+    // Arrange
+    let app = spawn_app().await;
+    let client = reqwest::Client::new();
+    let test_cases = vec![
+        ("name=&email=ursula_le_guin%40gmail.com", "empty name"),
+        ("name=Ursula&email=", "empty email"),
+        ("name=Ursula&email=definitely-not-an-email", "invalid email"),
+    ];
+    for (body, description) in test_cases {
+        // Act
+        let response = client
+            .post(&format!("{}/subscriptions", &app.address))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(body)
+            .send()
+            .await
+            .expect("Failed to execute request.");
+        // Assert
+        assert_eq!(
+            400,
+            response.status().as_u16(),
+            "The API did not return a 400 OK when the payload was {}.",
+            description
         );
     }
 }
