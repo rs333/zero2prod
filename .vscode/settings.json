@@ -1,9 +1,11 @@
 {
+        "editor.formatOnSave": true,
         "[rust]": {
                 "editor.defaultFormatter": "rust-lang.rust-analyzer",
                 "editor.formatOnSave": true,
         },
         "rust-analyzer.runnables.extraEnv": {
                 "RUST_BACKTRACE": "0"
-        }
+        },
+
 }
