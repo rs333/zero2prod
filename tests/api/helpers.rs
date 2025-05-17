@@ -1,5 +1,5 @@
 use once_cell::sync::Lazy;
-use sqlx::{Connection, Executor, PgConnection, PgPool, Row};
+use sqlx::{Connection, Executor, PgConnection, PgPool};
 use uuid::Uuid;
 use wiremock::MockServer;
 use zero2prod::{
@@ -8,7 +8,7 @@ use zero2prod::{
     telemetry::{get_subscriber, init_subscriber},
 };
 
-const DB_PREFIX: &str = "test_newsletter_";
+pub const DB_PREFIX: &str = "test_newsletter_";
 
 static TRACING: Lazy<()> = Lazy::new(|| {
     let default_filter_level = "info".to_string();
@@ -34,24 +34,6 @@ async fn configure_database(config: &DatabaseSettings) -> PgPool {
     let mut connection = PgConnection::connect_with(&config.without_db())
         .await
         .expect("Failed to connect to Postgres");
-
-    let databases = sqlx::query(
-        format!(
-            "SELECT datname FROM pg_database WHERE datname like '{}%';",
-            DB_PREFIX
-        )
-        .as_str(),
-    )
-    .fetch_all(&mut connection)
-    .await
-    .expect("Trouble connecting to find existing test databases.");
-
-    for db in databases {
-        let db = db.get::<String, _>("datname");
-        assert!(db.starts_with(DB_PREFIX));
-        let drop_query = format!("drop database \"{}\";", db);
-        let _ = sqlx::query(&drop_query).execute(&mut connection).await;
-    }
 
     connection
         .execute(
@@ -97,10 +79,11 @@ pub(crate) async fn spawn_app() -> TestApp {
     let address = format!("http://127.0.0.1:{}", application.port());
     let port = application.port();
     let _ = tokio::spawn(application.run_until_stopped());
+    let db_pool = get_connection_pool(&configuration.database);
 
     TestApp {
         address,
-        db_pool: get_connection_pool(&configuration.database),
+        db_pool,
         email_server,
         port,
     }
@@ -114,6 +97,18 @@ pub struct TestApp {
 }
 
 impl TestApp {
+    pub async fn post_newsletters(
+        &self,
+        body: serde_json::Value,
+    ) -> reqwest::Response {
+        reqwest::Client::new()
+            .post(&format!("{}/newsletters", &self.address))
+            .json(&body)
+            .send()
+            .await
+            .expect("Failed to execute request.")
+    }
+
     pub async fn post_subscriptions(&self, body: String) -> reqwest::Response {
         reqwest::Client::new()
             .post(&format!("{}/subscriptions", &self.address))
@@ -155,8 +150,3 @@ pub struct ConfirmationLinks {
     pub html: reqwest::Url,
     pub plain_text: reqwest::Url,
 }
-
-// impl ConfirmationLinks {
-//     pub fn from( email_request: &wiremock::Request,
-
-// }

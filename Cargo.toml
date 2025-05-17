@@ -6,6 +6,9 @@ edition = "2024"
 [lib]
 path = "src/lib.rs"
 
+[[bin]]
+path = "test_cleanup/clean_db.rs"
+name = "cleandb"
 
 [[bin]]
 path = "src/main.rs"
@@ -40,7 +43,7 @@ thiserror = "2.0.12"
 anyhow = "1.0.98"
 
 [dependencies.sqlx]
-version = "^0.8.3"
+version = "^0.8.5"
 default-features = false
 features = [
     "runtime-tokio-rustls",
