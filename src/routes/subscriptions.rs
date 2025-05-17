@@ -127,7 +127,7 @@ async fn send_confirmation_email(
 
     email_client
         .send_email(
-            new_subscriber.email,
+            &new_subscriber.email,
             "Email Confirmation",
             &html_body,
             &text_body,
@@ -183,7 +183,7 @@ impl Error for StoreTokenError {
 
 impl ResponseError for StoreTokenError {}
 
-fn error_chain_fmt(
+pub fn error_chain_fmt(
     e: &impl std::error::Error,
     f: &mut std::fmt::Formatter<'_>,
 ) -> std::fmt::Result {
@@ -204,14 +204,14 @@ pub async fn insert_subscription_token(
     subscriber_id: &Uuid,
     subscription_token: &str,
 ) -> Result<(), StoreTokenError> {
-    let query = sqlx::query!(
+    let query = sqlx::query(
         r#"
         INSERT INTO subscription_tokens (subscriber_id, subscription_token )
-        VALUES ($1, $2)
+        VALUES ($1, $2);
         "#,
-        subscriber_id,
-        subscription_token,
-    );
+    )
+    .bind(subscriber_id)
+    .bind(subscription_token);
     transaction.execute(query).await.map_err(StoreTokenError)?;
     Ok(())
 }

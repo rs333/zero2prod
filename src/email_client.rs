@@ -34,7 +34,7 @@ impl EmailClient {
     #[allow(unused_variables)]
     pub async fn send_email(
         &self,
-        receiver: SubscriberEmail,
+        receiver: &SubscriberEmail,
         subject: &str,
         html_body: &str,
         text_body: &str,
@@ -151,7 +151,7 @@ mod test {
             .await;
 
         let _ = email_client(mock_server.uri())
-            .send_email(email(), &subject(), &content(), &content())
+            .send_email(&email(), &subject(), &content(), &content())
             .await;
     }
 
@@ -166,7 +166,7 @@ mod test {
             .await;
 
         let outcome = email_client(mock_server.uri())
-            .send_email(email(), &subject(), &content(), &content())
+            .send_email(&email(), &subject(), &content(), &content())
             .await;
 
         assert_ok!(outcome)
@@ -183,7 +183,7 @@ mod test {
             .await;
 
         let outcome = email_client(mock_server.uri())
-            .send_email(email(), &subject(), &content(), &content())
+            .send_email(&email(), &subject(), &content(), &content())
             .await;
 
         assert_err!(outcome);
@@ -203,7 +203,7 @@ mod test {
             .await;
 
         let outcome = email_client(mock_server.uri())
-            .send_email(email(), &subject(), &content(), &content())
+            .send_email(&email(), &subject(), &content(), &content())
             .await;
 
         assert_err!(outcome);

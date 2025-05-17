@@ -6,7 +6,7 @@ use tracing_actix_web::TracingLogger;
 use crate::{
     configuration::{DatabaseSettings, Settings},
     email_client::EmailClient,
-    routes::{confirm, greet, health_check, subscribe},
+    routes::{confirm, greet, health_check, publish_newsletter, subscribe},
 };
 
 pub struct Application {
@@ -83,6 +83,7 @@ fn run(
         App::new()
             .wrap(TracingLogger::default())
             .route("/health_check", web::get().to(health_check))
+            .route("/newsletters", web::post().to(publish_newsletter))
             .route("/subscriptions", web::post().to(subscribe))
             .route("/subscriptions/confirm", web::get().to(confirm))
             .route("/{name}", web::get().to(greet))
@@ -97,7 +98,6 @@ fn run(
 
 pub fn get_connection_pool(configuration: &DatabaseSettings) -> PgPool {
     PgPoolOptions::new()
-        .acquire_timeout(std::time::Duration::from_secs(20))
-        .max_connections(1000)
+        .acquire_timeout(std::time::Duration::from_secs(2))
         .connect_lazy_with(configuration.with_db())
 }
