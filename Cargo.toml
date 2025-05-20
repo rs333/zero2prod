@@ -41,6 +41,8 @@ quickcheck_macros = "1.0.0"
 reqwest = { version = "^0.12", default-features = false, features = ["json", "rustls-tls"] }
 thiserror = "2.0.12"
 anyhow = "1.0.98"
+base64 = "0.22.1"
+argon2 = { version = "0.5.3", features = ["std"] }
 
 [dependencies.sqlx]
 version = "^0.8.5"
